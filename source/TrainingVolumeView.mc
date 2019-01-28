@@ -3,16 +3,16 @@ using Toybox.UserProfile;
 
 class TrainingVolumeView extends WatchUi.SimpleDataField {
 
-	// 全局变量
-	var trainingVolume;
-	var trainingVolumesPerMinute;
-	var restingHeartRate;
-	var maxHeartRate;
-	var lastUpdateTime;
-	var heartRateZoneStart;
-	var heartRateZoneEnd;
+    // 全局变量
+    var trainingVolume;
+    var trainingVolumesPerMinute;
+    var restingHeartRate;
+    var maxHeartRate;
+    var lastUpdateTime;
+    var heartRateZoneStart;
+    var heartRateZoneEnd;
 
-	// 初始化
+    // 初始化
     function initialize() {
         SimpleDataField.initialize();
 
