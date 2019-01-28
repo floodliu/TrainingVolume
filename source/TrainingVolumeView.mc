@@ -8,7 +8,9 @@ class TrainingVolumeView extends WatchUi.SimpleDataField {
 	var trainingVolumesPerMinute;
 	var restingHeartRate;
 	var maxHeartRate;
-	var lastTime;
+	var lastUpdateTime;
+	var heartRateZoneStart;
+	var heartRateZoneEnd;
 
 	// 初始化
     function initialize() {
@@ -23,20 +25,17 @@ class TrainingVolumeView extends WatchUi.SimpleDataField {
         	89 => 0.700, 90 => 0.723, 91 => 0.763, 92 => 0.800, 93 => 0.840, 94 => 0.883, 95 => 0.900,
         	96 => 0.917, 97 => 0.940, 98 => 0.960, 99 => 0.983, 100 => 1.000
         };
-        
+
         var profile = UserProfile.getProfile();
         restingHeartRate = profile.restingHeartRate;
         var heartRateZones = profile.getHeartRateZones(profile.getCurrentSport());
         maxHeartRate = heartRateZones[heartRateZones.size() - 1];
-        
-        lastTime = 0;
-        
-        System.println("Training Volume: " + trainingVolume);
-        System.println("Training Volumes Per Minute: " + trainingVolumesPerMinute);
-        System.println("Resting Heart Rate: " + restingHeartRate);
-        System.println("Max Heart Rate: " + maxHeartRate);
+
+        heartRateZoneStart = 59;
+        heartRateZoneEnd = 100;
+        lastUpdateTime = 0;
     }
-    
+
     // 根据心率、持续时间，计算这段时间的训练指数
     //
     // 参数：
@@ -47,17 +46,17 @@ class TrainingVolumeView extends WatchUi.SimpleDataField {
     function computeTrainingVolume(heartRate, duration) {
     	var hrrPercent = computeHrrPercent(heartRate);
     	var trainingVolumePerMinute = 0.0;
-    	if (hrrPercent < 59) {
-    		trainingVolumePerMinute = 0.0;
-    	} else if (hrrPercent > 100) {
-    		trainingVolumePerMinute = 1.0;
+    	if (hrrPercent < heartRateZoneStart) {
+    		trainingVolumePerMinute = trainingVolumesPerMinute[heartRateZoneStart] * hrrPercent / heartRateZoneStart;
+    	} else if (hrrPercent > heartRateZoneEnd) {
+    		trainingVolumePerMinute = trainingVolumesPerMinute[heartRateZoneEnd] * hrrPercent / heartRateZoneEnd;
     	} else {
     		trainingVolumePerMinute = trainingVolumesPerMinute.get(hrrPercent);
     	}
-    	
-		return trainingVolumePerMinute * duration / (60.0 * 1000);
+
+		return trainingVolumePerMinute * duration / (60 * 1000);
     }
-    
+
     // 计算心率对应的储备心率%（HRR：Heart Rate Reserve）
     //
     // 参数：
@@ -65,7 +64,8 @@ class TrainingVolumeView extends WatchUi.SimpleDataField {
     // 返回值：
     //		该心率对应的储备心率%
     function computeHrrPercent(heartRate) {
-    	return (heartRate - restingHeartRate) * 100 / (maxHeartRate - restingHeartRate);
+    	var hrrPercent = (heartRate - restingHeartRate) * 100.0 / (maxHeartRate - restingHeartRate);
+    	return Math.round(hrrPercent).toNumber();
     }
 
     // 计算要显示的数值（即该数据栏中显示的数值）
@@ -80,13 +80,10 @@ class TrainingVolumeView extends WatchUi.SimpleDataField {
     	if (info has :currentHeartRate && info.currentHeartRate != null) {
     		var hr = info.currentHeartRate;
     		var currentTime = info.timerTime;
-    		var trainingVolumeInDuration = computeTrainingVolume(hr, currentTime - lastTime);
-    		trainingVolume += trainingVolumeInDuration;
-//    		lastTime = currentTime;
-    		System.println("hr: " + hr + ", hrr%: " + computeHrrPercent(hr) + ", duration: " + (currentTime - lastTime) + ", volume: " + trainingVolumeInDuration + ", total: " + trainingVolume);
-    		lastTime = currentTime;
+    		trainingVolume += computeTrainingVolume(hr, currentTime - lastUpdateTime);
+    		lastUpdateTime = currentTime;
     	}
+
         return trainingVolume;
     }
-
 }
