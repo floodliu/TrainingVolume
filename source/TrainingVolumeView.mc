@@ -34,6 +34,11 @@ class TrainingVolumeView extends WatchUi.SimpleDataField {
         label = loadResource(Rez.Strings.Label);
         initStatisticalData();
         initHeartRateData();
+
+        System.println("最大心率：" + maxHeartRate);
+        System.println("静息心率：" + restingHeartRate);
+        System.println("上次更新：" + lastUpdateTime);
+        System.println("训练指数：" + trainingVolume);
     }
 
     // 初始化统计数据
@@ -77,15 +82,25 @@ class TrainingVolumeView extends WatchUi.SimpleDataField {
         if (currentTime < lastUpdateTime) {  // 重新开始了一个活动
             trainingVolume = 0.0;
             lastUpdateTime = currentTime;
+
+            System.println("新的活动");
+            System.println("上次更新：" + lastUpdateTime);
+            System.println("训练指数：" + trainingVolume);
         } else {  // 当前活动
             var volume = 0.0;
             if (heartRate != null) {
                 var hrrPercent = calcHrrPercent(heartRate);
                 var volumePerMinute = calcTrainingVolumePerMinute(hrrPercent);
                 volume = volumePerMinute * (currentTime - lastUpdateTime) / (60 * 1000);
+
+                System.println("心率：" + heartRate + ", HRR%：" + hrrPercent + ", 训练指数（每分钟）：" + volumePerMinute);
             }
 
             trainingVolume += volume;
+
+            System.println("当前时间：" + currentTime + ", 间隔：" + (currentTime - lastUpdateTime)
+                           + ", 本次训练量：" + volume + ", 总训练指数：" + trainingVolume);
+
             lastUpdateTime = currentTime;
         }
 
