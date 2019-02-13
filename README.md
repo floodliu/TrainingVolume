@@ -1,6 +1,6 @@
 # Training Volume
 
-Training Volume，中文翻译为 [训练指数][rq-trainingvolume]，是跑步训练量的一种表示方式。
+Training Volume，中文翻译为 [训练指数][jianshu-trainingvolume]，是跑步训练量的一种表示方式。
 
 本项目开发了一个 Garmin Connect IQ 数据栏（Data Field），方便跑者在训练中实时查看当前活动所累积的训练指数。该数据栏可用于 Garmin Forerunner、Feinix 系列的运动腕表。
 
@@ -41,4 +41,4 @@ Training Volume，中文翻译为 [训练指数][rq-trainingvolume]，是跑步�
 
 
 
-[rq-trainingvolume]: https://www.runningquotient.cn/article/single/28
+[jianshu-trainingvolume]: https://www.jianshu.com/p/57e8a465198b
